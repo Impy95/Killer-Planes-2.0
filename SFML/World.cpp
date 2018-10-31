@@ -138,7 +138,6 @@ namespace GEX {
 			auto spawnPoint = enemySpawnPoints_.back();
 			std::unique_ptr<Actor> enemy(new Actor(spawnPoint.type, textures_));
 			enemy->setPosition(spawnPoint.x, spawnPoint.y);
-			enemy->setRotation(180);
 			sceneLayer_[UpperAir]->attachChild(std::move(enemy));
 			enemySpawnPoints_.pop_back();
 		}
@@ -227,31 +226,31 @@ namespace GEX {
 
 		for (SceneNode::Pair pair : collisionPairs)
 		{
-			if (matchesCategories(pair, Category::Type::PlayerAircraft, Category::Type::EnemyAircraft))
+			if (matchesCategories(pair, Category::Type::Hero, Category::Type::Zombie))
 			{
-				auto& player = static_cast<Aircraft&>(*(pair.first));
-				auto& enemy = static_cast<Aircraft&>(*(pair.second));
+				auto& player = static_cast<Actor&>(*(pair.first));
+				auto& enemy = static_cast<Actor&>(*(pair.second));
 
-				player.damage(enemy.getHitPoints());
-				enemy.destroy();
+				player.damage(enemy.attackPoints());
+				enemy.damage(player.attackPoints());
 			}
-			else if (matchesCategories(pair, Category::Type::PlayerAircraft, Category::Type::Pickup))
-			{
-				auto& player = static_cast<Aircraft&>(*(pair.first));
-				auto& pickup = static_cast<Pickup&>(*(pair.second));
+			//else if (matchesCategories(pair, Category::Type::PlayerAircraft, Category::Type::Pickup))
+			//{
+			//	auto& player = static_cast<Aircraft&>(*(pair.first));
+			//	auto& pickup = static_cast<Pickup&>(*(pair.second));
 
-				pickup.apply(player);
-				pickup.destroy();
-			}
-			else if (matchesCategories(pair, Category::Type::PlayerAircraft, Category::Type::EnemyProjectile)
-			|| (matchesCategories(pair, Category::Type::EnemyAircraft, Category::Type::AlliedProjectile)))
-			{
-				auto& aircraft = static_cast<Aircraft&>(*(pair.first));
-				auto& projectile = static_cast<Projectile&>(*(pair.second));
+			//	pickup.apply(player);
+			//	pickup.destroy();
+			//}
+			//else if (matchesCategories(pair, Category::Type::PlayerAircraft, Category::Type::EnemyProjectile)
+			//|| (matchesCategories(pair, Category::Type::EnemyAircraft, Category::Type::AlliedProjectile)))
+			//{
+			//	auto& aircraft = static_cast<Aircraft&>(*(pair.first));
+			//	auto& projectile = static_cast<Projectile&>(*(pair.second));
 
-				aircraft.damage(projectile.getDamage());
-				projectile.destroy();
-			}
+			//	aircraft.damage(projectile.getDamage());
+			//	projectile.destroy();
+			//}
 		}
 	}
 
@@ -276,7 +275,7 @@ namespace GEX {
 	void World::destroyEntitiesOutOfView()
 	{
 		Command command;
-		command.category = Category::Type::Projectile | Category::Type::EnemyAircraft;
+		command.category = Category::Type::Zombie;
 		command.action = derivedAction<Entity>([this](Entity& e, sf::Time dt)
 		{
 			if (!getBattlefieldBounds().intersects(e.getBoundingBox()))

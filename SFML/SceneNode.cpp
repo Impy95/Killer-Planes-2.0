@@ -109,7 +109,7 @@ namespace GEX {
 		return false;
 	}
 
-	bool SceneNode::isMarkedForRemoval() const
+	bool SceneNode::isMarkedForRemoval() const 
 	{
 		return isDestroyed();
 	}

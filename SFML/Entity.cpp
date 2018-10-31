@@ -43,7 +43,7 @@ namespace GEX {
 
 	void Entity::damage(int points)
 	{
-		assert(points > 0);
+		assert(points >= 0);
 		hitPoints_ -= points;
 	}
 

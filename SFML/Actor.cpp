@@ -131,6 +131,11 @@ namespace GEX
 			return 0;
 	}
 
+	bool Actor::isMarkedForRemoval() const
+	{
+		return isDestroyed() && animations_[State::Dead].isFinished();
+	}
+
 	void Actor::updateStates()
 	{
 		if (state_ == State::Attack && animations_[state_].isFinished())
@@ -148,6 +153,9 @@ namespace GEX
 
 		if (state_ == State::Idle && length(getVelocity()) > 0.1f)
 			state_ = State::Walk;
+
+		if (isDestroyed())
+			state_ = State::Dead;
 	}
 
 	void Actor::updateCurrent(sf::Time dt, GEX::CommandQueue & commands)

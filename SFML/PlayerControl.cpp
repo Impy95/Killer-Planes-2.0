@@ -35,7 +35,7 @@ namespace GEX {
 		initalizeActions();
 
 		for (auto& pair : actionBindings_)
-			pair.second.category = Category::PlayerAircraft;
+			pair.second.category = Category::Hero;
 
 
 	}
@@ -83,6 +83,7 @@ namespace GEX {
 		actionBindings_[Action::MoveDown].action = derivedAction<Actor>(ActorMover(0.f, +playerSpeed));
 
 		actionBindings_[Action::Attack].action = derivedAction<Actor>([](Actor& node, sf::Time dt) { node.attack(); });
+		//actionBindings_[Action::Attack].category = Category::Type::Hero;
 
 	}
 
