@@ -1,8 +1,8 @@
 /**
 * @file
-* Category.h
+* Animation2.h
 * @author
-* Vaughn Rowse
+* Vaughn Rowse 2018
 * @version 1.0
 *
 * @section DESCRIPTION
@@ -27,25 +27,45 @@
 * NBCC Academic Integrity Policy (policy 1111)
 */
 #pragma once
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Time.hpp>
 
-namespace Category 
+namespace sf
 {
-	enum Type
-	{
-		None				= 0,
-		Scene				= 1 << 0,
-		PlayerAircraft		= 1 << 1,
-		AlliedAircraft		= 1 << 2,
-		EnemyAircraft		= 1 << 3,
-		EnemyProjectile		= 1 << 4,
-		AlliedProjectile	= 1 << 5,
-		AirSceneLayer		= 1 << 6,
-		Pickup				= 1 << 7,
-		ParticleSystem		= 1 << 8,
-		Zombie				= 1 << 9,
-		Hero				= 1 << 10,
+	class Time;
+}
 
-		Aircraft = PlayerAircraft | AlliedAircraft | EnemyAircraft,
-		Projectile = AlliedProjectile | EnemyProjectile
+using Frame = sf::IntRect;
+
+namespace GEX
+{
+	class Animation2
+	{
+	public:
+							Animation2(bool repeat = true);
+
+		void				addFrame(Frame frame);
+		void				addFrameSet(const std::vector<Frame> frames);
+		void				setDuration(sf::Time duration);
+		sf::Time			getDuration() const;
+
+		void				setRepeat(bool flag);
+		bool				isRepeating() const;
+
+		void				restart();
+		bool				isFinished() const;
+
+		Frame				getCurrentFrame() const;
+
+		Frame				update(sf::Time dt);
+
+	private:
+		std::vector<Frame>	frames_;
+		std::size_t			currentFrame_;
+		sf::Time			duration_;
+		sf::Time			elapsedTime_;
+		bool				repeat_;
 	};
 }
+

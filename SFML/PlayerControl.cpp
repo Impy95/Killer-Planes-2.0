@@ -4,21 +4,23 @@
 #include "CommandQueue.h"
 #include "Category.h"
 #include <functional>
+#include "Actor.h"
 
 namespace GEX {
-	struct AircraftMover
+	struct ActorMover
 	{
 	public:
-		AircraftMover(float vx, float vy)
+		ActorMover(float vx, float vy)
 			: velocity(vx, vy)
 		{}
-		void operator() (Aircraft& aircraft, sf::Time) const
+		void operator() (Actor& actor, sf::Time) const
 		{
-			aircraft.accelerate(velocity);
+			actor.accelerate(velocity);
 		}
 
 		sf::Vector2f velocity;
 	};
+
 	PlayerControl::PlayerControl()
 		: currentMissionStatus_(MissionStatus::MissionRunning)
 	{
@@ -27,21 +29,13 @@ namespace GEX {
 		keyBindings_[sf::Keyboard::D] = Action::MoveRight;
 		keyBindings_[sf::Keyboard::W] = Action::MoveUp;
 		keyBindings_[sf::Keyboard::S] = Action::MoveDown;
-
-		keyBindings_[sf::Keyboard::Space] = Action::Fire;
-		keyBindings_[sf::Keyboard::Q] = Action::LaunchMissile;
-		//keyBindings_[sf::Keyboard::J] = Action::RR;
-		//keyBindings_[sf::Keyboard::L] = Action::RL;
-
+		keyBindings_[sf::Keyboard::Space] = Action::Attack;
 
 		// set up action bindings
 		initalizeActions();
 
 		for (auto& pair : actionBindings_)
 			pair.second.category = Category::PlayerAircraft;
-
-		//actionBindings_[Action::RR].category = Category::EnemyAircraft;
-		//actionBindings_[Action::RL].category = Category::EnemyAircraft;
 
 
 	}
@@ -83,19 +77,13 @@ namespace GEX {
 	{
 		const float playerSpeed = 200.f;
 
-		actionBindings_[Action::MoveLeft].action = derivedAction<Aircraft>(AircraftMover(-playerSpeed, 0.f));
-		actionBindings_[Action::MoveRight].action = derivedAction<Aircraft>(AircraftMover(+playerSpeed, 0.f));
-		actionBindings_[Action::MoveUp].action = derivedAction<Aircraft>(AircraftMover(0.f, -playerSpeed));
-		actionBindings_[Action::MoveDown].action = derivedAction<Aircraft>(AircraftMover(0.f, +playerSpeed));
-		// rotate raptors
-		//actionBindings_[Action::RR].action = derivedAction<Aircraft>([](SceneNode& node, sf::Time dt) {node.rotate(+1.f); });
-		//actionBindings_[Action::RL].action = derivedAction<Aircraft>([](SceneNode& node, sf::Time dt) {node.rotate(-1.f); });
+		actionBindings_[Action::MoveLeft].action = derivedAction<Actor>(ActorMover(-playerSpeed, 0.f));
+		actionBindings_[Action::MoveRight].action = derivedAction<Actor>(ActorMover(+playerSpeed, 0.f));
+		actionBindings_[Action::MoveUp].action = derivedAction<Actor>(ActorMover(0.f, -playerSpeed));
+		actionBindings_[Action::MoveDown].action = derivedAction<Actor>(ActorMover(0.f, +playerSpeed));
 
-		actionBindings_[Action::Fire].action = derivedAction<Aircraft>(std::bind(&Aircraft::fire, std::placeholders::_1));
-		actionBindings_[Action::Fire].category = Category::PlayerAircraft;
+		actionBindings_[Action::Attack].action = derivedAction<Actor>([](Actor& node, sf::Time dt) { node.attack(); });
 
-		actionBindings_[Action::LaunchMissile].action = derivedAction<Aircraft>(std::bind(&Aircraft::launchMissile, std::placeholders::_1));
-		actionBindings_[Action::LaunchMissile].category = Category::PlayerAircraft;
 	}
 
 	bool PlayerControl::isRealTimeAction(Action action)
@@ -106,9 +94,6 @@ namespace GEX {
 		case Action::MoveRight:
 		case Action::MoveDown:
 		case Action::MoveUp:
-		case Action::RR:
-		case Action::RL:
-		case Action::Fire:
 			return true;
 			break;
 		default:

@@ -18,10 +18,8 @@ namespace GEX {
 		MoveRight,
 		MoveUp,
 		MoveDown,
-		Fire,
-		LaunchMissile,
-		RR,
-		RL
+		Attack,
+		Jump
 	};
 
 	enum MissionStatus

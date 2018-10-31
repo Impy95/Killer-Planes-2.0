@@ -27,9 +27,136 @@
 * NBCC Academic Integrity Policy (policy 1111)
 */
 #include "DataTables.h"
+#include "JsonFrameParser.h"
+#include "Actor.h"
 
 namespace GEX
 {
+	std::map<Actor::Type, ActorData> initalizeActorData()
+	{
+		std::map<Actor::Type, ActorData> data;
+
+		data[Actor::Type::Hero2].texture = TextureID::Hero2;
+		data[Actor::Type::Hero2].hitpoints = 100;
+		data[Actor::Type::Hero2].damageDone = 5;
+		data[Actor::Type::Hero2].speed = 50;
+
+		JsonFrameParser frames = JsonFrameParser("Media/Textures/hero2.json");
+
+		data[Actor::Type::Hero2].animations[Actor::State::Idle].addFrameSet(frames.getFramesFor("idle"));
+		data[Actor::Type::Hero2].animations[Actor::State::Idle].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Hero2].animations[Actor::State::Idle].setRepeat(true);
+
+		data[Actor::Type::Hero2].animations[Actor::State::Jump].addFrameSet(frames.getFramesFor("jump"));
+		data[Actor::Type::Hero2].animations[Actor::State::Jump].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Hero2].animations[Actor::State::Jump].setRepeat(false);
+
+		data[Actor::Type::Hero2].animations[Actor::State::Attack].addFrameSet(frames.getFramesFor("attack"));
+		data[Actor::Type::Hero2].animations[Actor::State::Attack].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Hero2].animations[Actor::State::Attack].setRepeat(false);
+
+		data[Actor::Type::Hero2].animations[Actor::State::Walk].addFrameSet(frames.getFramesFor("walk"));
+		data[Actor::Type::Hero2].animations[Actor::State::Walk].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Hero2].animations[Actor::State::Walk].setRepeat(true);
+
+		data[Actor::Type::Hero2].animations[Actor::State::Run].addFrameSet(frames.getFramesFor("run"));
+		data[Actor::Type::Hero2].animations[Actor::State::Run].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Hero2].animations[Actor::State::Run].setRepeat(true);
+
+		data[Actor::Type::Hero2].animations[Actor::State::Dead].addFrameSet(frames.getFramesFor("dead"));
+		data[Actor::Type::Hero2].animations[Actor::State::Dead].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Hero2].animations[Actor::State::Dead].setRepeat(false);
+
+
+		data[Actor::Type::Zombie1].texture = TextureID::Zombie1;
+		data[Actor::Type::Zombie1].hitpoints = 100;
+		data[Actor::Type::Zombie1].damageDone = 1;
+		data[Actor::Type::Zombie1].speed = 50;
+
+		frames = JsonFrameParser("Media/Textures/zombie1_sheet.json");
+
+		data[Actor::Type::Zombie1].animations[Actor::State::Idle].addFrameSet(frames.getFramesFor("idle"));
+		data[Actor::Type::Zombie1].animations[Actor::State::Idle].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie1].animations[Actor::State::Idle].setRepeat(true);
+		data[Actor::Type::Zombie1].animations[Actor::State::Attack].addFrameSet(frames.getFramesFor("attack"));
+		data[Actor::Type::Zombie1].animations[Actor::State::Attack].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie1].animations[Actor::State::Attack].setRepeat(true);
+		data[Actor::Type::Zombie1].animations[Actor::State::Walk].addFrameSet(frames.getFramesFor("walk"));
+		data[Actor::Type::Zombie1].animations[Actor::State::Walk].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie1].animations[Actor::State::Walk].setRepeat(true);
+		data[Actor::Type::Zombie1].animations[Actor::State::Dead].addFrameSet(frames.getFramesFor("dead"));
+		data[Actor::Type::Zombie1].animations[Actor::State::Dead].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie1].animations[Actor::State::Dead].setRepeat(false);
+		data[Actor::Type::Zombie1].animations[Actor::State::Rise].addFrameSet(frames.getFramesFor("rise"));
+		data[Actor::Type::Zombie1].animations[Actor::State::Rise].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie1].animations[Actor::State::Rise].setRepeat(false);
+
+		data[Actor::Type::Zombie1].directions.emplace_back(Direction(45.f, 50.f));
+		data[Actor::Type::Zombie1].directions.emplace_back(Direction(-45.f, 100.f));
+		data[Actor::Type::Zombie1].directions.emplace_back(Direction(45.f, 50.f));
+
+
+
+		data[Actor::Type::Zombie2].texture = TextureID::Zombie2;
+		data[Actor::Type::Zombie2].hitpoints = 100;
+		data[Actor::Type::Zombie2].damageDone = 1;
+		data[Actor::Type::Zombie2].speed = 50;
+
+		frames = JsonFrameParser("Media/Textures/zombie2.json");
+
+		data[Actor::Type::Zombie2].animations[Actor::State::Idle].addFrameSet(frames.getFramesFor("idle"));
+		data[Actor::Type::Zombie2].animations[Actor::State::Idle].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie2].animations[Actor::State::Idle].setRepeat(true);
+		data[Actor::Type::Zombie2].animations[Actor::State::Attack].addFrameSet(frames.getFramesFor("attack"));
+		data[Actor::Type::Zombie2].animations[Actor::State::Attack].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie2].animations[Actor::State::Attack].setRepeat(true);
+		data[Actor::Type::Zombie2].animations[Actor::State::Walk].addFrameSet(frames.getFramesFor("walk"));
+		data[Actor::Type::Zombie2].animations[Actor::State::Walk].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie2].animations[Actor::State::Walk].setRepeat(true);
+		data[Actor::Type::Zombie2].animations[Actor::State::Dead].addFrameSet(frames.getFramesFor("dead"));
+		data[Actor::Type::Zombie2].animations[Actor::State::Dead].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie2].animations[Actor::State::Dead].setRepeat(false);
+		data[Actor::Type::Zombie2].animations[Actor::State::Rise].addFrameSet(frames.getFramesFor("rise"));
+		data[Actor::Type::Zombie2].animations[Actor::State::Rise].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie2].animations[Actor::State::Rise].setRepeat(false);
+
+
+		data[Actor::Type::Zombie2].directions.emplace_back(Direction(45.f, 50.f));
+		data[Actor::Type::Zombie2].directions.emplace_back(Direction(-45.f, 100.f));
+		data[Actor::Type::Zombie2].directions.emplace_back(Direction(45.f, 50.f));
+
+
+
+
+		data[Actor::Type::Zombie3].texture = TextureID::Zombie3;
+		data[Actor::Type::Zombie3].hitpoints = 100;
+		data[Actor::Type::Zombie3].damageDone = 1;
+		data[Actor::Type::Zombie3].speed = 50;
+		frames = JsonFrameParser("Media/Textures/zombie3.json");
+
+		data[Actor::Type::Zombie3].animations[Actor::State::Idle].addFrameSet(frames.getFramesFor("idle"));
+		data[Actor::Type::Zombie3].animations[Actor::State::Idle].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie3].animations[Actor::State::Idle].setRepeat(true);
+		data[Actor::Type::Zombie3].animations[Actor::State::Attack].addFrameSet(frames.getFramesFor("attack"));
+		data[Actor::Type::Zombie3].animations[Actor::State::Attack].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie3].animations[Actor::State::Attack].setRepeat(true);
+		data[Actor::Type::Zombie3].animations[Actor::State::Walk].addFrameSet(frames.getFramesFor("walk"));
+		data[Actor::Type::Zombie3].animations[Actor::State::Walk].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie3].animations[Actor::State::Walk].setRepeat(true);
+		data[Actor::Type::Zombie3].animations[Actor::State::Dead].addFrameSet(frames.getFramesFor("dead"));
+		data[Actor::Type::Zombie3].animations[Actor::State::Dead].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie3].animations[Actor::State::Dead].setRepeat(false);
+		data[Actor::Type::Zombie3].animations[Actor::State::Rise].addFrameSet(frames.getFramesFor("walk"));
+		data[Actor::Type::Zombie3].animations[Actor::State::Rise].setDuration(sf::seconds(1.f));
+		data[Actor::Type::Zombie3].animations[Actor::State::Rise].setRepeat(false);
+
+		data[Actor::Type::Zombie3].directions.emplace_back(Direction(45.f, 50.f));
+		data[Actor::Type::Zombie3].directions.emplace_back(Direction(-45.f, 100.f));
+		data[Actor::Type::Zombie3].directions.emplace_back(Direction(45.f, 50.f));
+
+
+		return data;
+	}
 
 	std::map<Pickup::Type, PickupData> initalizePickupData()
 	{

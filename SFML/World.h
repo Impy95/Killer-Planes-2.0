@@ -13,6 +13,7 @@
 #include "CommandQueue.h"
 
 #include <vector>
+#include "Actor.h"
 
 // forward declaration
 namespace sf
@@ -38,7 +39,7 @@ namespace GEX {
 		void						adaptPlayerVelocity();
 
 		void						addEnemies();
-		void						addEnemy(AircraftType type, float relX, float relY);
+		void						addEnemy(Actor::Type type, float relX, float relY);
 		void						spawnEnemies();
 
 		sf::FloatRect				getViewBounds() const;
@@ -61,12 +62,12 @@ namespace GEX {
 
 		struct SpawnPoint
 		{
-			SpawnPoint(AircraftType type, float x, float y) 
+			SpawnPoint(Actor::Type type, float x, float y) 
 				: type(type)
 				, x(x)
 				, y(y) 
 			{}
-			AircraftType	type;
+			Actor::Type		type;
 			float			x;
 			float			y;
 		};
@@ -85,7 +86,7 @@ namespace GEX {
 		float						scrollSpeeds_;
 
 		int							count_;
-		Aircraft*					playerAircraft_;
+		Actor*						playerActor_;
 
 		std::vector<SpawnPoint>		enemySpawnPoints_;
 		std::vector<Aircraft*>		activeEnemies_;

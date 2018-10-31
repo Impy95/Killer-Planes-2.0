@@ -43,7 +43,7 @@ namespace GEX {
 		spawnPosition_(worldView_.getSize().x / 2.f, worldBounds_.height - worldView_.getSize().y / 2.f),
 		scrollSpeeds_(-50.f),
 		count_(0),
-		playerAircraft_(nullptr)
+		playerActor_(nullptr)
 	{
 		loadTextures();
 		buildScene();
@@ -57,7 +57,7 @@ namespace GEX {
 		// scroll the world
 		worldView_.move(0.f, scrollSpeeds_ * dt.asSeconds());
 
-		playerAircraft_->setVelocity(0.f, 0.f);
+		playerActor_->setVelocity(0.f, 0.f);
 
 		destroyEntitiesOutOfView();
 		guideMissile();
@@ -75,21 +75,6 @@ namespace GEX {
 
 		spawnEnemies();
 
-		// zoom a little
-		// worldView_.zoom(1.001);	
-		// rotate a little
-		// worldView_.rotate(.1);
-
-		// move player
-		//sf::Vector2f pos = playerAircraft_->getPosition();
-		//float bounds = worldView_.getSize().x;
-
-		//if (pos.x < 120.f || pos.x > bounds - 120.f)
-		//{
-		//	playerAircraft_->setVelocity(
-		//		sf::Vector2f(	playerAircraft_->getVelocity().x * -1, 
-		//						playerAircraft_->getVelocity().y));
-		//}
 	}
 
 	void World::adaptPlayerPosition()
@@ -97,41 +82,40 @@ namespace GEX {
 		const float BORDER_DISTANCE = 40.f;
 		sf::FloatRect viewBounds(worldView_.getCenter() - worldView_.getSize() / 2.f, worldView_.getSize());
 
-		sf::Vector2f position = playerAircraft_->getPosition();
+		sf::Vector2f position = playerActor_->getPosition();
 		position.x = std::max(position.x, viewBounds.left + BORDER_DISTANCE);
 		position.x = std::min(position.x, viewBounds.left + viewBounds.width - BORDER_DISTANCE);
 
 		position.y = std::max(position.y, viewBounds.top + BORDER_DISTANCE);
 		position.y = std::min(position.y, viewBounds.top + viewBounds.height - BORDER_DISTANCE);
 
-		playerAircraft_->setPosition(position);
+		playerActor_->setPosition(position);
 	}
 
 	void World::adaptPlayerVelocity()
 	{
-		sf::Vector2f velocity = playerAircraft_->getVelocity();
+		sf::Vector2f velocity = playerActor_->getVelocity();
 		if (velocity.x != 0.f && velocity.y != 0.f)
-			playerAircraft_->setVelocity(velocity / std::sqrt(2.f));
+			playerActor_->setVelocity(velocity / std::sqrt(2.f));
 	}
 
 	void World::addEnemies()
 	{
-		addEnemy(AircraftType::Raptor, -250.f, 200.f);
-		addEnemy(AircraftType::Raptor, 0.f, 200.f);
-		addEnemy(AircraftType::Raptor, 250.f, 200.f);
+		addEnemy(Actor::Type::Zombie1, -250.f, 200.f);
+		addEnemy(Actor::Type::Zombie1, 0.f, 200.f);
+		addEnemy(Actor::Type::Zombie1, 250.f, 200.f);
 
-		addEnemy(AircraftType::Raptor, -250.f, 600.f);
-		addEnemy(AircraftType::Raptor, 0.f, 600.f);
-		addEnemy(AircraftType::Raptor, 250.f, 600.f);
+		addEnemy(Actor::Type::Zombie1, -250.f, 600.f);
+		addEnemy(Actor::Type::Zombie2, 0.f, 600.f);
+		addEnemy(Actor::Type::Zombie3, 250.f, 600.f);
 
-		addEnemy(AircraftType::Avenger, -70.f, 400.f);
-		addEnemy(AircraftType::Avenger, 70.f, 400.f);
+		addEnemy(Actor::Type::Zombie2, -70.f, 400.f);
+		addEnemy(Actor::Type::Zombie2, 70.f, 400.f);
+		addEnemy(Actor::Type::Zombie2, -70.f, 800.f);
 
-		addEnemy(AircraftType::Avenger, -70.f, 800.f);
-		addEnemy(AircraftType::Avenger, 70.f, 800.f);
-
-		addEnemy(AircraftType::Avenger, -70.f, 850.f);
-		addEnemy(AircraftType::Avenger, 70.f, 850.f);
+		addEnemy(Actor::Type::Zombie3, 70.f, 800.f);
+		addEnemy(Actor::Type::Zombie3, -70.f, 850.f);
+		addEnemy(Actor::Type::Zombie3, 70.f, 850.f);
 
 		std::sort(enemySpawnPoints_.begin(), enemySpawnPoints_.end(), 
 			[](SpawnPoint lhs, SpawnPoint rhs)
@@ -140,7 +124,7 @@ namespace GEX {
 			});
 	}
 
-	void World::addEnemy(AircraftType type, float relX, float relY)
+	void World::addEnemy(Actor::Type type, float relX, float relY)
 	{
 		SpawnPoint spawnPoint(type, spawnPosition_.x - relX, spawnPosition_.y - relY);
 		enemySpawnPoints_.push_back(spawnPoint);
@@ -152,7 +136,7 @@ namespace GEX {
 			enemySpawnPoints_.back().y > getBattlefieldBounds().top)
 		{
 			auto spawnPoint = enemySpawnPoints_.back();
-			std::unique_ptr<Aircraft> enemy(new Aircraft(spawnPoint.type, textures_));
+			std::unique_ptr<Actor> enemy(new Actor(spawnPoint.type, textures_));
 			enemy->setPosition(spawnPoint.x, spawnPoint.y);
 			enemy->setRotation(180);
 			sceneLayer_[UpperAir]->attachChild(std::move(enemy));
@@ -227,12 +211,12 @@ namespace GEX {
 
 	bool World::hasAlivePlayer() const
 	{
-		return !playerAircraft_->isDestroyed();
+		return !playerActor_->isDestroyed();
 	}
 
 	bool World::hasPlayerReachedEnd() const
 	{
-		return !worldBounds_.contains(playerAircraft_->getPosition());
+		return !worldBounds_.contains(playerActor_->getPosition());
 	}
 
 	void World::handleCollisions()
@@ -309,6 +293,11 @@ namespace GEX {
 		textures_.load(GEX::TextureID::Particle, "Media/Textures/Particle.png");
 		textures_.load(GEX::TextureID::Explosion, "Media/Textures/Explosion.png");
 		textures_.load(GEX::TextureID::FinishLine, "Media/Textures/FinishLine.png");
+		textures_.load(GEX::TextureID::Hero2, "Media/Textures/hero2.png");
+		textures_.load(GEX::TextureID::Zombie1, "Media/Textures/zombie1_sheet.png");
+		textures_.load(GEX::TextureID::Zombie2, "Media/Textures/zombie2.png");
+		textures_.load(GEX::TextureID::Zombie3, "Media/Textures/zombie3.png");
+		
 	}
 
 	void World::buildScene()
@@ -339,10 +328,10 @@ namespace GEX {
 		sceneLayer_[Background]->attachChild(std::move(backgroundSprite));
 
 		// add player aircraft & game objects
-		std::unique_ptr<Aircraft> leader(new Aircraft(AircraftType::Eagle, textures_));
+		std::unique_ptr<Actor> leader(new Actor(Actor::Type::Hero2, textures_));
 		leader->setPosition(spawnPosition_);
 		leader->setVelocity(200.f, scrollSpeeds_);
-		playerAircraft_ = leader.get();
+		playerActor_ = leader.get();
 		sceneLayer_[UpperAir]->attachChild(std::move(leader));
 
 		// add enemy aircraft

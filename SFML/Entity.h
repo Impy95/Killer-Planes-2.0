@@ -40,7 +40,7 @@ namespace GEX {
 		void			setVelocity(float vx, float vy);
 		sf::Vector2f	getVelocity() const;
 
-		void			accelerate(sf::Vector2f velocity);
+		virtual void	accelerate(sf::Vector2f velocity);
 		void			accelerate(float vx, float vy);
 
 		int				getHitPoints() const;

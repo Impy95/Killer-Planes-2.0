@@ -33,6 +33,8 @@
 #include "Pickup.h"
 #include "Particle.h"
 #include <map>
+#include "Animation2.h"
+#include "Actor.h"
 
 namespace GEX
 {
@@ -79,9 +81,21 @@ namespace GEX
 		sf::Time	lifetime;
 	};
 
-	std::map<Pickup::Type, PickupData> initalizePickupData();
-	std::map<Projectile::Type, ProjectileData> initalizeProjectileData();
-	std::map<AircraftType, AircraftData> initalizeAircraftData();
-	std::map<Particle::Type, ParticleData> initalizeParticleData();
+	struct ActorData
+	{
+		int									hitpoints;
+		float								speed;
+		int									damageDone;
+		TextureID							texture;
+
+		std::vector<Direction>				directions;
+		std::map<Actor::State, Animation2>	animations;
+	};
+
+	std::map<Actor::Type, ActorData>			initalizeActorData();
+	std::map<Pickup::Type, PickupData>			initalizePickupData();
+	std::map<Projectile::Type, ProjectileData>	initalizeProjectileData();
+	std::map<AircraftType, AircraftData>		initalizeAircraftData();
+	std::map<Particle::Type, ParticleData>		initalizeParticleData();
 }
 
