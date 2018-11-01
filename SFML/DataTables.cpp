@@ -72,6 +72,7 @@ namespace GEX
 		data[Actor::Type::Zombie1].hitpoints = 100;
 		data[Actor::Type::Zombie1].damageDone = 1;
 		data[Actor::Type::Zombie1].speed = 50;
+		data[Actor::Type::Zombie1].follows = true;
 
 		frames = JsonFrameParser("Media/Textures/zombie1_sheet.json");
 
@@ -101,6 +102,7 @@ namespace GEX
 		data[Actor::Type::Zombie2].hitpoints = 100;
 		data[Actor::Type::Zombie2].damageDone = 1;
 		data[Actor::Type::Zombie2].speed = 50;
+		data[Actor::Type::Zombie2].follows = false;
 
 		frames = JsonFrameParser("Media/Textures/zombie2.json");
 
@@ -133,6 +135,7 @@ namespace GEX
 		data[Actor::Type::Zombie3].damageDone = 1;
 		data[Actor::Type::Zombie3].speed = 50;
 		frames = JsonFrameParser("Media/Textures/zombie3.json");
+		data[Actor::Type::Zombie3].follows = false;
 
 		data[Actor::Type::Zombie3].animations[Actor::State::Idle].addFrameSet(frames.getFramesFor("idle"));
 		data[Actor::Type::Zombie3].animations[Actor::State::Idle].setDuration(sf::seconds(1.f));

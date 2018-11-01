@@ -55,6 +55,8 @@ namespace GEX
 		int				attackPoints() const;
 
 		bool			isMarkedForRemoval() const override;
+		void			guidedTowards(sf::Vector2f position);
+		bool			isGuided() const;
 
 	private:
 		void			drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -74,6 +76,7 @@ namespace GEX
 		float									travelDistance_;
 		std::size_t								directionIndex_;
 		bool									attack_;
+		sf::Vector2f							targetDirection_;
 	};
 }
 

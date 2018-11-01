@@ -87,6 +87,7 @@ namespace GEX
 		float								speed;
 		int									damageDone;
 		TextureID							texture;
+		bool								follows;
 
 		std::vector<Direction>				directions;
 		std::map<Actor::State, Animation2>	animations;

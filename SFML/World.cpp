@@ -60,7 +60,7 @@ namespace GEX {
 		playerActor_->setVelocity(0.f, 0.f);
 
 		destroyEntitiesOutOfView();
-		guideMissile();
+		guideZombie();
 
 		// run all the commands in the command queue
 		while (!commandQueue_.isEmpty())
@@ -156,44 +156,44 @@ namespace GEX {
 		return bounds;
 	}
 
-	void World::guideMissile()
+	void World::guideZombie()
 	{
 		// build a list of active Enemies
-		Command enemyCollector;
-		enemyCollector.category = Category::EnemyAircraft;
-		enemyCollector.action = derivedAction<Aircraft>([this](Aircraft& enemy, sf::Time dt)
+		Command heroCollector;
+		heroCollector.category = Category::Hero;
+		heroCollector.action = derivedAction<Actor>([this](Actor& hero, sf::Time dt)
 		{
-			if (!enemy.isDestroyed())
-				activeEnemies_.push_back(&enemy);
+			if (!hero.isDestroyed())
+				activeEnemies_.push_back(&hero);
 		});
 
-		Command missileGuider;
-		missileGuider.category = Category::Type::AlliedProjectile;
-		missileGuider.action = derivedAction<Projectile>([this](Projectile& missile, sf::Time dt)
+		Command zombieGuider;
+		zombieGuider.category = Category::Type::Zombie;
+		zombieGuider.action = derivedAction<Actor>([this](Actor& zombie, sf::Time dt)
 		{
-			// ignore bullets
-			if (!missile.isGuided())
+			// ignore not guided zombies
+			if (!zombie.isGuided())
 				return;
 
 			float minDistance = std::numeric_limits<float>::max();
-			Aircraft* closestEnemy = nullptr;
+			Actor* hero = nullptr;
 
-			for (Aircraft* e : activeEnemies_)
+			for (Actor* e : activeEnemies_)
 			{
-				auto d = distance(missile, *e);
+				auto d = distance(zombie, *e);
 				if (d < minDistance)
 				{
 					minDistance = d;
-					closestEnemy = e;
+					hero = e;
 				}
 			}
 
-			if (closestEnemy)
-				missile.guidedTowards(closestEnemy->getWorldPosition());
+			if (hero)
+				zombie.guidedTowards(hero->getWorldPosition());
 		});
 
-		commandQueue_.push(enemyCollector);
-		commandQueue_.push(missileGuider);
+		commandQueue_.push(heroCollector);
+		commandQueue_.push(zombieGuider);
 		activeEnemies_.clear();
 	}
 
@@ -228,29 +228,30 @@ namespace GEX {
 		{
 			if (matchesCategories(pair, Category::Type::Hero, Category::Type::Zombie))
 			{
-				auto& player = static_cast<Actor&>(*(pair.first));
-				auto& enemy = static_cast<Actor&>(*(pair.second));
+				auto& hero  = static_cast<Actor&>(*(pair.first));
+				auto& zombie = static_cast<Actor&>(*(pair.second));
 
-				player.damage(enemy.attackPoints());
-				enemy.damage(player.attackPoints());
+				hero.damage(zombie.attackPoints());
+				zombie.damage(hero.attackPoints());
+
+				auto zpos = zombie.getPosition();
+				auto hpos = hero.getPosition();
+				auto diffPos = zpos - hpos;
+				zombie.setPosition(zpos + 0.2f * diffPos);
+				hero.setPosition(hpos - 0.1f * diffPos);
 			}
-			//else if (matchesCategories(pair, Category::Type::PlayerAircraft, Category::Type::Pickup))
-			//{
-			//	auto& player = static_cast<Aircraft&>(*(pair.first));
-			//	auto& pickup = static_cast<Pickup&>(*(pair.second));
 
-			//	pickup.apply(player);
-			//	pickup.destroy();
-			//}
-			//else if (matchesCategories(pair, Category::Type::PlayerAircraft, Category::Type::EnemyProjectile)
-			//|| (matchesCategories(pair, Category::Type::EnemyAircraft, Category::Type::AlliedProjectile)))
-			//{
-			//	auto& aircraft = static_cast<Aircraft&>(*(pair.first));
-			//	auto& projectile = static_cast<Projectile&>(*(pair.second));
+			else if (matchesCategories(pair, Category::Type::Zombie, Category::Type::Zombie))
+			{
+				auto& zombie1 = static_cast<Actor&>(*(pair.first));
+				auto& zombie2 = static_cast<Actor&>(*(pair.second));
 
-			//	aircraft.damage(projectile.getDamage());
-			//	projectile.destroy();
-			//}
+				auto zpos = zombie1.getPosition();
+				auto hpos = zombie2.getPosition();
+				auto diffPos = zpos - hpos;
+				zombie1.setPosition(zpos + 0.2f * diffPos);
+				zombie2.setPosition(hpos - 0.1f * diffPos);
+			}
 		}
 	}
 

@@ -62,23 +62,26 @@ namespace GEX
 
 	void Actor::updateMovementPattern(sf::Time dt)
 	{
-		// movement pattern
-		const std::vector<GEX::Direction> directions = TABLE.at(type_).directions;
-
-		if (!directions.empty())
+		if (!isGuided())
 		{
-			if (travelDistance_ > (directions[directionIndex_].distance))
+			// movement pattern
+			const std::vector<GEX::Direction> directions = TABLE.at(type_).directions;
+
+			if (!directions.empty())
 			{
-				directionIndex_ = (++directionIndex_) % directions.size();
-				travelDistance_ = 0;
+				if (travelDistance_ > (directions[directionIndex_].distance))
+				{
+					directionIndex_ = (++directionIndex_) % directions.size();
+					travelDistance_ = 0;
+				}
+
+				float radians = toRadian(directions[directionIndex_].angle + 90.f);
+				float vx = getMaxSpeed() * std::cos(radians);
+				float vy = getMaxSpeed() * std::sin(radians);
+
+				setVelocity(vx, vy);
+				travelDistance_ += getMaxSpeed() * dt.asSeconds();
 			}
-
-			float radians = toRadian(directions[directionIndex_].angle + 90.f);
-			float vx = getMaxSpeed() * std::cos(radians);
-			float vy = getMaxSpeed() * std::sin(radians);
-
-			setVelocity(vx, vy);
-			travelDistance_ += getMaxSpeed() * dt.asSeconds();
 		}
 	}
 
@@ -136,6 +139,18 @@ namespace GEX
 		return isDestroyed() && animations_[State::Dead].isFinished();
 	}
 
+	void Actor::guidedTowards(sf::Vector2f position)
+	{
+		assert(isGuided());
+		targetDirection_ = unitVector(position - getWorldPosition());
+	}
+
+	bool Actor::isGuided() const
+	{
+		//return type_ == Type::Zombie1;
+		return TABLE.at(type_).follows;
+	}
+
 	void Actor::updateStates()
 	{
 		if (state_ == State::Attack && animations_[state_].isFinished())
@@ -158,8 +173,22 @@ namespace GEX
 			state_ = State::Dead;
 	}
 
-	void Actor::updateCurrent(sf::Time dt, GEX::CommandQueue & commands)
+	void Actor::updateCurrent(sf::Time dt, CommandQueue & commands)
 	{
+		if (isGuided())
+		{
+			const float APPROACH_RATE = 400.f;
+
+			auto newVelocity = unitVector(APPROACH_RATE * dt.asSeconds() * targetDirection_ + getVelocity());
+
+			newVelocity *= getMaxSpeed();
+			setVelocity(newVelocity);
+
+			//auto angle = std::atan2(newVelocity.y, newVelocity.x);
+			//setRotation(toDegree(angle) + 90);
+		}
+
+
 		updateStates();
 
 		auto rec = animations_.at(state_).update(dt);

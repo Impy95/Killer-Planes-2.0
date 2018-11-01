@@ -45,7 +45,7 @@ namespace GEX {
 		sf::FloatRect				getViewBounds() const;
 		sf::FloatRect				getBattlefieldBounds() const;
 
-		void						guideMissile();
+		void						guideZombie();
 		void						handleCollisions();
 		bool						matchesCategories(SceneNode::Pair& colliders, Category::Type type1, Category::Type type2);
 
@@ -89,7 +89,7 @@ namespace GEX {
 		Actor*						playerActor_;
 
 		std::vector<SpawnPoint>		enemySpawnPoints_;
-		std::vector<Aircraft*>		activeEnemies_;
+		std::vector<Actor*>		activeEnemies_;
 	};
 }
 
