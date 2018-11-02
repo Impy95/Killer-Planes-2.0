@@ -3,6 +3,8 @@
 #include "Animation2.h"
 #include <SFML/Graphics/Sprite.hpp>
 #include <map>
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 
 namespace GEX
 {
@@ -57,6 +59,8 @@ namespace GEX
 		bool			isMarkedForRemoval() const override;
 		void			guidedTowards(sf::Vector2f position);
 		bool			isGuided() const;
+		void			activateForceField();
+		bool			isForceFieldActive() const;
 
 	private:
 		void			drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -77,6 +81,13 @@ namespace GEX
 		std::size_t								directionIndex_;
 		bool									attack_;
 		sf::Vector2f							targetDirection_;
+
+		bool									isForceField_;
+		sf::Time								forceFieldDuration_;
+		sf::Time								forceFieldCooldown_;
+		TextNode*								forceFieldCooldownText_;
+		TextNode*								forceFieldDurationText_;
+		sf::CircleShape							forceFieldCircle_;
 	};
 }
 

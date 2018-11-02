@@ -4,6 +4,7 @@
 #include "Utility.h"
 #include "DataTables.h"
 #include "TextNode.h"
+#include "FontManager.h"
 
 namespace GEX
 {
@@ -21,6 +22,9 @@ namespace GEX
 		, travelDistance_(0.f)
 		, directionIndex_(0)
 		, attack_(false)
+		, isForceField_(false)
+		, forceFieldDuration_(sf::Time::Zero)
+		, forceFieldCooldown_(sf::Time::Zero)
 
 	{
 		for (auto a : TABLE.at(type).animations)
@@ -37,6 +41,22 @@ namespace GEX
 		std::unique_ptr<TextNode> health(new TextNode(""));
 		healthDisplay_ = health.get();
 		attachChild(std::move(health));
+
+		// set up force field cooldown text
+		std::unique_ptr<TextNode> forceFieldCooldown(new TextNode(""));
+		forceFieldCooldownText_ = forceFieldCooldown.get();
+		attachChild(std::move(forceFieldCooldown));
+
+		std::unique_ptr<TextNode> forceFieldDuration(new TextNode(""));
+		forceFieldDurationText_ = forceFieldDuration.get();
+		attachChild(std::move(forceFieldDuration));
+
+		forceFieldCircle_.setFillColor(sf::Color(54, 243, 255));
+		forceFieldCircle_.setOutlineColor(sf::Color::Black);
+		forceFieldCircle_.setOutlineThickness(2.f);
+		forceFieldCircle_.setRadius(50);
+
+		centerOrigin(forceFieldCircle_);
 
 		updateTexts();
 	}
@@ -151,6 +171,18 @@ namespace GEX
 		return TABLE.at(type_).follows;
 	}
 
+	void Actor::activateForceField()
+	{
+		isForceField_ = true;
+		forceFieldDuration_ = sf::seconds(5.f);
+		forceFieldCooldown_ = sf::seconds(15.f);
+	}
+
+	bool Actor::isForceFieldActive() const
+	{
+		return isForceField_;
+	}
+
 	void Actor::updateStates()
 	{
 		if (state_ == State::Attack && animations_[state_].isFinished())
@@ -188,6 +220,14 @@ namespace GEX
 			//setRotation(toDegree(angle) + 90);
 		}
 
+		if (forceFieldDuration_ > sf::Time::Zero)
+			forceFieldDuration_ -= dt;
+
+		if (forceFieldDuration_ <= sf::Time::Zero)
+			isForceField_ = false;
+
+		if (forceFieldCooldown_ > sf::Time::Zero)
+			forceFieldCooldown_ -= dt;
 
 		updateStates();
 
@@ -205,7 +245,13 @@ namespace GEX
 		sprite_.setTextureRect(rec);
 		centerOrigin(sprite_);
 
-		if (state_ != State::Dead) // dont move it while dying
+		if (type_ == Type::Hero2)
+		{
+			forceFieldCircle_.setPosition(sprite_.getPosition());
+			centerOrigin(forceFieldCircle_);
+		}
+
+		if (state_ != State::Dead) // don't move it while dying
 			Entity::updateCurrent(dt, commands);
 
 		updateMovementPattern(dt);
@@ -214,6 +260,10 @@ namespace GEX
 
 	void Actor::drawCurrent(sf::RenderTarget & target, sf::RenderStates states) const
 	{
+		if (type_ == Type::Hero2 && isForceFieldActive())
+		{
+			target.draw(forceFieldCircle_, states);
+		}
 		target.draw(sprite_, states);
 	}
 
@@ -222,5 +272,31 @@ namespace GEX
 		healthDisplay_->setText(std::to_string(getHitPoints()) + "HP");
 		healthDisplay_->setPosition(0.f, 70.f);
 		healthDisplay_->setRotation(-getRotation());
+
+		if (type_ == Type::Hero2 && forceFieldCooldown_ > sf::Time::Zero)
+		{
+			forceFieldCooldownText_->setText("FF CD: " + std::to_string(static_cast<int>(forceFieldCooldown_.asSeconds())));
+			forceFieldCooldownText_->setPosition(0.f, -70.f);
+			forceFieldCooldownText_->setRotation(-getRotation());
+		}
+		else if (type_ == Type::Hero2 && forceFieldCooldown_ <= sf::Time::Zero)
+		{
+			forceFieldCooldownText_->setText("FF Ready!");
+			forceFieldCooldownText_->setPosition(0.f, -70.f);
+			forceFieldCooldownText_->setRotation(-getRotation());
+		}
+
+		if (type_ == Type::Hero2 && forceFieldDuration_ > sf::Time::Zero)
+		{
+			forceFieldDurationText_->setText("FF: " + std::to_string(static_cast<int>(forceFieldDuration_.asSeconds())));
+			forceFieldDurationText_->setPosition(0.f, 90.f);
+			forceFieldDurationText_->setRotation(-getRotation());
+		}
+		else if (type_ == Type::Hero2 && forceFieldDuration_ <= sf::Time::Zero)
+		{
+			forceFieldDurationText_->setText("");
+			forceFieldDurationText_->setPosition(0.f, 90.f);
+			forceFieldDurationText_->setRotation(-getRotation());
+		}
 	}
 }

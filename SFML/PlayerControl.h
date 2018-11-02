@@ -19,7 +19,8 @@ namespace GEX {
 		MoveUp,
 		MoveDown,
 		Attack,
-		Jump
+		Jump,
+		ForceField
 	};
 
 	enum MissionStatus

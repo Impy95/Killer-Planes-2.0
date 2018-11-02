@@ -231,7 +231,8 @@ namespace GEX {
 				auto& hero  = static_cast<Actor&>(*(pair.first));
 				auto& zombie = static_cast<Actor&>(*(pair.second));
 
-				hero.damage(zombie.attackPoints());
+				if (!hero.isForceFieldActive())
+					hero.damage(zombie.attackPoints());
 				zombie.damage(hero.attackPoints());
 
 				auto zpos = zombie.getPosition();

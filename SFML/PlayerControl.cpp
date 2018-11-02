@@ -30,6 +30,7 @@ namespace GEX {
 		keyBindings_[sf::Keyboard::W] = Action::MoveUp;
 		keyBindings_[sf::Keyboard::S] = Action::MoveDown;
 		keyBindings_[sf::Keyboard::Space] = Action::Attack;
+		keyBindings_[sf::Keyboard::F] = Action::ForceField;
 
 		// set up action bindings
 		initalizeActions();
@@ -83,6 +84,7 @@ namespace GEX {
 		actionBindings_[Action::MoveDown].action = derivedAction<Actor>(ActorMover(0.f, +playerSpeed));
 
 		actionBindings_[Action::Attack].action = derivedAction<Actor>([](Actor& node, sf::Time dt) { node.attack(); });
+		actionBindings_[Action::ForceField].action = derivedAction<Actor>([](Actor& node, sf::Time dt) {node.activateForceField(); });
 		//actionBindings_[Action::Attack].category = Category::Type::Hero;
 
 	}

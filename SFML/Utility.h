@@ -29,6 +29,7 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include "Animation.h"
+#include <SFML/Graphics/CircleShape.hpp>
 
 namespace sf
 {
@@ -39,6 +40,7 @@ namespace sf
 void centerOrigin(sf::Sprite& sprite);
 void centerOrigin(sf::Text& text);
 void centerOrigin(GEX::Animation& animation);
+void centerOrigin(sf::CircleShape& animation);
 
 // Degree/radian conversion
 float			toDegree(float radian);

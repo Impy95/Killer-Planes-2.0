@@ -38,8 +38,6 @@ Application::Application()
 
 void Application::run()
 {
-
-
 	sf::Clock clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
 

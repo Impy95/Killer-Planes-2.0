@@ -88,6 +88,7 @@ namespace GEX
 		int									damageDone;
 		TextureID							texture;
 		bool								follows;
+		bool								forceField;
 
 		std::vector<Direction>				directions;
 		std::map<Actor::State, Animation2>	animations;
